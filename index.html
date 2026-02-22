@@ -440,7 +440,7 @@
     const database = firebase.database();
     const DB_REF = database.ref('iftar-locations');
     
-    const ADMIN_SECRET = "kakarotbd2026";
+    const ADMIN_SECRET = "";
     const urlParams = new URLSearchParams(window.location.search);
     const isAdmin = urlParams.get("admin") === ADMIN_SECRET;
     
@@ -507,10 +507,6 @@
             
             <select id="edit-food-type" class="w-full p-3 border-2 border-amber-700 rounded-xl">
                 <option value="ইফতার">ইফতার</option>
-                <option value="কাচ্চি বিরিয়ানি">কাচ্চি বিরিয়ানি</option>
-                <option value="তেহারি">তেহারি</option>
-                <option value="গরু বিরিয়ানি">গরু বিরিয়ানি</option>
-                <option value="চিকেন বিরিয়ানি">চিকেন বিরিয়ানি</option>
             </select>
             
             <textarea id="edit-description" placeholder="বিশেষ তথ্য" 
@@ -1215,5 +1211,6 @@
 </script>
 </body>
 </html>
+
 
 
