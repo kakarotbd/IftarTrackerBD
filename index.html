@@ -56,6 +56,12 @@
             border-bottom: 4px solid #b45309;
             border-radius: 0 0 30px 30px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: all 0.5s ease;
+        }
+        
+        #map.zoomed {
+            height: 500px;
+            transition: height 0.5s ease;
         }
         
         .dark #map {
@@ -134,22 +140,6 @@
             box-shadow: 0 4px 6px rgba(180, 83, 9, 0.3);
         }
         
-        /* Admin Badge */
-        .admin-badge {
-            position: fixed;
-            top: 70px;
-            right: 10px;
-            background: #b45309;
-            color: white;
-            padding: 6px 16px;
-            border-radius: 40px;
-            font-size: 12px;
-            font-weight: bold;
-            z-index: 1000;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            border: 2px solid #fbbf24;
-        }
-        
         /* Language Switch */
         .lang-switch {
             background: white;
@@ -191,6 +181,7 @@
             position: relative;
             transition: transform 0.2s;
             margin-bottom: 20px;
+            cursor: pointer;
         }
         
         .mosque-card:hover {
@@ -222,6 +213,7 @@
             right: 10px;
             display: flex;
             gap: 5px;
+            z-index: 20;
         }
         
         .edit-btn, .delete-btn {
@@ -231,6 +223,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
+            pointer-events: auto;
         }
         
         .edit-btn {
@@ -419,6 +412,63 @@
             color: white;
             transform: scale(1.02);
         }
+
+        /* Required field indicator */
+        .required-field::after {
+            content: " *";
+            color: #ef4444;
+            font-weight: bold;
+        }
+        
+        .google-maps-btn {
+            background: #4285F4;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: 2px solid white;
+            text-decoration: none;
+        }
+        
+        .google-maps-btn:hover {
+            background: #3367D6;
+            transform: scale(1.05);
+        }
+
+        /* Food Type Badge */
+        .food-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .food-iftar {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .food-biryani {
+            background: #10b981;
+            color: white;
+        }
+        
+        .food-kacchi {
+            background: #8b5cf6;
+            color: white;
+        }
+        
+        .food-others {
+            background: #6b7280;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -460,11 +510,8 @@
 <!-- Preloader -->
 <div id="preloader">
     <div class="arabic text-7xl mb-6 text-amber-700 dark:text-amber-500 animate-pulse">﷽</div>
-    <p class="text-amber-700 dark:text-amber-400 font-bold text-xl" id="preloader-text">ইফতার তথ্য সংগ্রহ করা হচ্ছে...</p>
+    <p class="text-amber-700 dark:text-amber-400 font-bold text-xl" id="preloader-text">তথ্য সংগ্রহ করা হচ্ছে...</p>
 </div>
-
-<!-- Admin Badge -->
-<div id="adminBadge" class="admin-badge hidden">🔐 ADMIN MODE</div>
 
 <!-- Language Switch -->
 <div class="lang-switch">
@@ -492,21 +539,26 @@
         <h2 class="text-2xl font-bold text-amber-700 mb-4" id="edit-title">তথ্য সম্পাদনা করুন</h2>
         
         <div class="space-y-4">
-            <input type="text" id="edit-mosque-name" placeholder="মসজিদের নাম" 
+            <input type="text" id="edit-mosque-name" placeholder="মসজিদের নাম *" 
                 class="w-full p-3 border-2 border-amber-700 rounded-xl">
             
-            <input type="url" id="edit-google-map-link" placeholder="গুগল ম্যাপ লিংক" 
+            <input type="url" id="edit-google-map-link" placeholder="গুগল ম্যাপ লিংক *" 
                 class="w-full p-3 border-2 border-amber-700 rounded-xl">
             
-            <input type="text" id="edit-area-name" placeholder="এলাকা/ঠিকানা" 
+            <input type="text" id="edit-area-name" placeholder="এলাকা/ঠিকানা *" 
                 class="w-full p-3 border-2 border-amber-700 rounded-xl">
             
             <select id="edit-district" class="w-full p-3 border-2 border-amber-700 rounded-xl">
-                <option value="">জেলা নির্বাচন করুন</option>
+                <option value="">জেলা নির্বাচন করুন *</option>
             </select>
             
             <select id="edit-food-type" class="w-full p-3 border-2 border-amber-700 rounded-xl">
                 <option value="ইফতার">ইফতার</option>
+                <option value="বিরিয়ানি">বিরিয়ানি</option>
+                <option value="কাচ্চি">কাচ্চি</option>
+                <option value="ইফতার + বিরিয়ানি">ইফতার + বিরিয়ানি</option>
+                <option value="ইফতার + কাচ্চি">ইফতার + কাচ্চি</option>
+                <option value="অন্যান্য">অন্যান্য</option>
             </select>
             
             <textarea id="edit-description" placeholder="বিশেষ তথ্য" 
@@ -521,7 +573,7 @@
 </div>
 
 <!-- Map -->
-<div id="map"></div>
+<div id="map" onclick="resetMapView()"></div>
 
 <!-- Header -->
 <div class="bg-amber-700 text-white py-4 px-4 sticky top-0 z-50 shadow-lg" style="background: linear-gradient(135deg, #b45309 0%, #92400e 100%);">
@@ -597,7 +649,6 @@
             </a>
             <a href="https://github.com/kakarotbd" target="_blank" title="GitHub">
                 <i class="fa-brands fa-github"></i>
-
             </a>
         </div>
         
@@ -636,7 +687,7 @@
                 class="w-full p-4 bg-gray-100 dark:bg-gray-700 rounded-2xl outline-none border-2 focus:border-amber-700">
             
             <input id="google-map-link" type="url" 
-                placeholder="গুগল ম্যাপ লিংক (ঐচ্ছিক)" 
+                placeholder="গুগল ম্যাপ লিংক *" 
                 class="w-full p-4 bg-gray-100 dark:bg-gray-700 rounded-2xl outline-none border-2 focus:border-amber-700">
             
             <input id="area-name" type="text" 
@@ -651,6 +702,11 @@
             
             <select id="food-type" class="w-full p-4 bg-gray-100 dark:bg-gray-700 rounded-2xl outline-none border-2 focus:border-amber-700">
                 <option value="ইফতার">ইফতার</option>
+                <option value="বিরিয়ানি">বিরিয়ানি</option>
+                <option value="কাচ্চি">কাচ্চি</option>
+                <option value="ইফতার + বিরিয়ানি">ইফতার + বিরিয়ানি</option>
+                <option value="ইফতার + কাচ্চি">ইফতার + কাচ্চি</option>
+                <option value="অন্যান্য">অন্যান্য</option>
             </select>
             
             <textarea id="loc-desc" 
@@ -704,7 +760,8 @@
             'confirm-yes': { bn: 'নিশ্চিত', en: 'Confirm' },
             'dev-by': { bn: 'নির্মাণে', en: 'Developed by' },
             'dev-message': { bn: 'ইফতারের লোকেশন শেয়ার করুন। আপনার একটি ছোট উদ্যোগ হাজারো মানুষের উপকারে আসতে পারে এবং এর মাধ্যমে আপনি সওয়াব অর্জন করতে পারেন।', en: 'Please share your Iftar location. Your small initiative can help thousands of people and become a source of reward for you' },
-            'share-banner-text': { bn: '🔹 এই সাইটটি মসজিদে ইফতার কোথায় দেয় তা জানার জন্য তৈরি করা হয়েছে। বেশি বেশি শেয়ার করে অন্যদের সাহায্য করুন 🔹', en: '🔹 This site helps find iftar locations at mosques. Share to help others 🔹' }
+            'share-banner-text': { bn: '🔹 এই সাইটটি মসজিদে ইফতার কোথায় দেয় তা জানার জন্য তৈরি করা হয়েছে। বেশি বেশি শেয়ার করে অন্যদের সাহায্য করুন 🔹', en: '🔹 This site helps find iftar locations at mosques. Share to help others 🔹' },
+            'edit-title': { bn: 'তথ্য সম্পাদনা করুন', en: 'Edit Information' }
         };
         
         for (let [id, texts] of Object.entries(translations)) {
@@ -716,9 +773,12 @@
         document.getElementById('search-input').placeholder = lang === 'bn' ? 'মসজিদ/এলাকা খুঁজুন...' : 'Search mosque/area...';
         document.getElementById('user-name').placeholder = lang === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your name (optional)';
         document.getElementById('mosque-name').placeholder = lang === 'bn' ? 'মসজিদের নাম *' : 'Mosque name *';
-        document.getElementById('google-map-link').placeholder = lang === 'bn' ? 'গুগল ম্যাপ লিংক (ঐচ্ছিক)' : 'Google Map link (optional)';
+        document.getElementById('google-map-link').placeholder = lang === 'bn' ? 'গুগল ম্যাপ লিংক *' : 'Google Map link *';
         document.getElementById('area-name').placeholder = lang === 'bn' ? 'এলাকা/ঠিকানা *' : 'Area/Address *';
         document.getElementById('loc-desc').placeholder = lang === 'bn' ? 'বিশেষ তথ্য (ঐচ্ছিক)...' : 'Additional info (optional)...';
+        document.getElementById('edit-mosque-name').placeholder = lang === 'bn' ? 'মসজিদের নাম *' : 'Mosque name *';
+        document.getElementById('edit-google-map-link').placeholder = lang === 'bn' ? 'গুগল ম্যাপ লিংক *' : 'Google Map link *';
+        document.getElementById('edit-area-name').placeholder = lang === 'bn' ? 'এলাকা/ঠিকানা *' : 'Area/Address *';
         
         applyFilters();
     }
@@ -745,6 +805,7 @@
     let selectedDistrict = '';
     let currentEditId = null;
     let userIP = '';
+    let mapInitialized = false;
     
     // ==================== GET USER IP ====================
     async function getUserIP() {
@@ -809,6 +870,8 @@
     }
     
     function initMap() {
+        if (mapInitialized) return;
+        
         map = L.map('map', {
             maxBounds: [
                 [BANGLADESH_BOUNDS.south, BANGLADESH_BOUNDS.west],
@@ -858,6 +921,8 @@
             );
         }
         
+        mapInitialized = true;
+        
         getUserIP().then(() => {
             loadData();
         });
@@ -865,7 +930,7 @@
     
     // ==================== VALIDATE GOOGLE MAP LINK ====================
     function isValidGoogleMapLink(link) {
-        if (!link || link.trim() === '') return true; // Optional field
+        if (!link || link.trim() === '') return false; // Now required
         
         const patterns = [
             /^https?:\/\/(www\.)?google\.com\/maps\/.*$/i,
@@ -916,6 +981,17 @@
         document.getElementById('active-count').innerText = filtered.length;
     }
     
+    // ==================== GET FOOD BADGE CLASS ====================
+    function getFoodBadgeClass(foodType) {
+        if (!foodType) return 'food-others';
+        
+        if (foodType.includes('ইফতার') && !foodType.includes('+')) return 'food-iftar';
+        if (foodType.includes('বিরিয়ানি') || foodType.includes('বিরিয়ানি')) return 'food-biryani';
+        if (foodType.includes('কাচ্চি')) return 'food-kacchi';
+        if (foodType.includes('+')) return 'food-iftar';
+        return 'food-others';
+    }
+    
     // ==================== RENDER POSTS ====================
     function renderPosts(posts) {
         const container = document.getElementById('post-container');
@@ -935,14 +1011,13 @@
             const date = new Date(post.timestamp);
             const formattedDate = date.toLocaleDateString('bn-BD', {day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit'});
             
-            let mapLink = post.googleMapLink || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(post.mosqueName + ' ' + post.area + ', Bangladesh')}`;
-            
             // Check if current user is the owner (by IP)
             const isOwner = post.userIP === userIP;
+            const foodBadgeClass = getFoodBadgeClass(post.foodType);
             
             container.innerHTML += `
-                <div class="mosque-card" data-post-id="${post.id}">
-                    <div class="owner-controls">
+                <div class="mosque-card" onclick="focusMapToLocation(${post.lat || 23.6850}, ${post.lng || 90.3563}, '${post.mosqueName.replace(/'/g, "\\'")}', '${post.googleMapLink.replace(/'/g, "\\'")}')" data-post-id="${post.id}">
+                    <div class="owner-controls" onclick="event.stopPropagation()">
                         ${isAdmin || isOwner ? `
                             <button onclick="editPost('${post.id}')" class="edit-btn">
                                 <i class="fa-solid fa-pen"></i> ${currentLang === 'bn' ? 'এডিট' : 'Edit'}
@@ -956,6 +1031,10 @@
                     <div class="flex justify-between items-start mb-3">
                         <span class="bg-amber-700 text-white text-xs px-3 py-1 rounded-full">
                             <i class="fa-solid fa-location-dot"></i> ${post.district}
+                        </span>
+                        <span class="food-badge ${foodBadgeClass}">
+                            🍽️ ${post.foodType || 'ইফতার'}
+                        </span>
                     </div>
                     
                     <h3 class="text-2xl font-black mb-2 flex items-center gap-2">
@@ -967,9 +1046,6 @@
                     </p>
                     
                     <div class="flex flex-wrap gap-2 mb-4">
-                        <span class="bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-sm font-bold px-4 py-2 rounded-full">
-                            🍽️ ${post.foodType}
-                        </span>
                         <span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm px-4 py-2 rounded-full">
                             👤 ${post.userName || 'বেনামী'}
                         </span>
@@ -977,11 +1053,11 @@
                     
                     ${post.description ? `<p class="text-sm mb-4 bg-amber-50 dark:bg-gray-700 p-3 rounded-xl">📝 ${post.description}</p>` : ''}
                     
-                    <div class="flex gap-2">
-                        <a href="${mapLink}" target="_blank" class="flex-1 bg-amber-700 text-white py-4 rounded-full text-sm font-bold text-center">
-                            <i class="fa-brands fa-google mr-2"></i> Google Map
+                    <div class="flex gap-2" onclick="event.stopPropagation()">
+                        <a href="${post.googleMapLink}" target="_blank" class="flex-1 bg-blue-600 text-white py-4 rounded-full text-sm font-bold text-center google-maps-btn">
+                            <i class="fa-brands fa-google mr-2"></i> Google Maps
                         </a>
-                        <button onclick="sharePost('${post.mosqueName}', '${post.area}')" class="bg-green-500 text-white p-4 rounded-full">
+                        <button onclick="sharePost('${post.mosqueName.replace(/'/g, "\\'")}', '${post.area.replace(/'/g, "\\'")}')" class="bg-green-500 text-white p-4 rounded-full">
                             <i class="fa-brands fa-whatsapp"></i>
                         </button>
                     </div>
@@ -994,8 +1070,66 @@
         });
     }
     
+    // ==================== MAP FOCUS FUNCTION ====================
+    function focusMapToLocation(lat, lng, mosqueName, googleMapLink) {
+        if (!mapInitialized) {
+            initMap();
+        }
+        
+        // Scroll to map smoothly
+        document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
+        
+        if (lat && lng && lat !== 0 && lng !== 0) {
+            // Zoom to location with animation
+            map.flyTo([lat, lng], 16, {
+                animate: true,
+                duration: 2
+            });
+            
+            // Add zoomed class to map
+            document.getElementById('map').classList.add('zoomed');
+            
+            // Remove previous popups
+            map.closePopup();
+            
+            // Show popup after animation
+            setTimeout(() => {
+                L.popup({ 
+                    closeButton: true,
+                    autoClose: true,
+                    className: 'custom-popup'
+                })
+                .setLatLng([lat, lng])
+                .setContent(`
+                    <div style="text-align: center; min-width: 200px;">
+                        <b style="font-size: 16px;">🕌 ${mosqueName}</b><br>
+                        <a href="${googleMapLink}" target="_blank" style="display:inline-block; margin-top:10px; padding:10px 20px; background:#4285F4; color:white; text-decoration:none; border-radius:30px; font-weight:bold;">
+                            <i class="fa-brands fa-google"></i> Google Maps খুলুন
+                        </a>
+                    </div>
+                `)
+                .openOn(map);
+            }, 500);
+        } else {
+            // If no coordinates, just open Google Maps directly
+            window.open(googleMapLink, '_blank');
+        }
+    }
+    
+    function resetMapView() {
+        if (map) {
+            map.flyTo([23.6850, 90.3563], 7, {
+                animate: true,
+                duration: 1.5
+            });
+            document.getElementById('map').classList.remove('zoomed');
+        }
+    }
+    
     // ==================== UPDATE MAP ====================
     function updateMap(posts) {
+        if (!map || !markersLayer) return;
+        
         markersLayer.clearLayers();
         
         posts.forEach(post => {
@@ -1009,10 +1143,21 @@
                 }).addTo(markersLayer);
                 
                 marker.bindPopup(`
-                    <b>${post.mosqueName}</b><br>
-                    ${post.area}, ${post.district}<br>
-                    <a href="${post.googleMapLink || '#'}" target="_blank">Open in Google Maps</a>
+                    <div style="text-align: center;">
+                        <b>🕌 ${post.mosqueName}</b><br>
+                        ${post.area}, ${post.district}<br>
+                        <span style="display:inline-block; margin-top:5px; padding:3px 10px; background:${post.foodType === 'ইফতার' ? '#f59e0b' : post.foodType === 'বিরিয়ানি' ? '#10b981' : post.foodType === 'কাচ্চি' ? '#8b5cf6' : '#6b7280'}; color:white; border-radius:15px; font-size:11px;">
+                            🍽️ ${post.foodType || 'ইফতার'}
+                        </span><br>
+                        <a href="${post.googleMapLink}" target="_blank" style="display:inline-block; margin-top:8px; padding:5px 15px; background:#4285F4; color:white; text-decoration:none; border-radius:20px; font-size:12px; font-weight:bold;">
+                            <i class="fa-brands fa-google"></i> Google Maps
+                        </a>
+                    </div>
                 `);
+                
+                marker.on('click', () => {
+                    focusMapToLocation(post.lat, post.lng, post.mosqueName, post.googleMapLink);
+                });
             }
         });
     }
@@ -1052,8 +1197,8 @@
             return;
         }
         
-        if (googleMapLink && !isValidGoogleMapLink(googleMapLink)) {
-            alert(currentLang === 'bn' ? 'গুগল ম্যাপ লিংক সঠিক নয়' : 'Invalid Google Map link');
+        if (!googleMapLink || !isValidGoogleMapLink(googleMapLink)) {
+            alert(currentLang === 'bn' ? 'গুগল ম্যাপ লিংক আবশ্যক এবং সঠিক হতে হবে' : 'Google Map link is required and must be valid');
             return;
         }
         
@@ -1099,9 +1244,9 @@
             return;
         }
         
-        // Validate Google Map link if provided
-        if (googleMapLink && !isValidGoogleMapLink(googleMapLink)) {
-            alert(currentLang === 'bn' ? 'গুগল ম্যাপ লিংক সঠিক নয়। সঠিক লিংক দিন অথবা ফাঁকা রাখুন।' : 'Invalid Google Map link. Provide a valid link or leave empty.');
+        // Validate Google Map link - now required
+        if (!googleMapLink || !isValidGoogleMapLink(googleMapLink)) {
+            alert(currentLang === 'bn' ? 'গুগল ম্যাপ লিংক আবশ্যক এবং সঠিক হতে হবে' : 'Google Map link is required and must be valid');
             return;
         }
         
@@ -1211,6 +1356,3 @@
 </script>
 </body>
 </html>
-
-
-
