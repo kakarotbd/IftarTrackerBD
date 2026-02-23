@@ -48,7 +48,7 @@
             background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path d="M20,20 Q35,5 50,20 T80,20" stroke="%23fbbf24" fill="none" stroke-width="2"/><path d="M20,40 Q35,25 50,40 T80,40" stroke="%23fbbf24" fill="none" stroke-width="2"/><path d="M20,60 Q35,45 50,60 T80,60" stroke="%23fbbf24" fill="none" stroke-width="2"/><circle cx="30" cy="80" r="3" fill="%23fbbf24"/><circle cx="50" cy="80" r="3" fill="%23fbbf24"/><circle cx="70" cy="80" r="3" fill="%23fbbf24"/></svg>');
         }
         
-        /* Map - Only Bangladesh View */
+        /* Map Styles */
         #map {
             height: 400px;
             width: 100%;
@@ -61,7 +61,6 @@
         
         #map.zoomed {
             height: 500px;
-            transition: height 0.5s ease;
         }
         
         .dark #map {
@@ -94,7 +93,7 @@
             border-color: rgba(217, 119, 6, 0.3);
         }
         
-        /* District Grid - 64 Districts */
+        /* District Grid */
         .district-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -206,48 +205,7 @@
             font-size: 14px;
         }
         
-        /* Owner Controls */
-        .owner-controls {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            gap: 5px;
-            z-index: 20;
-        }
-        
-        .edit-btn, .delete-btn {
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            pointer-events: auto;
-        }
-        
-        .edit-btn {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .delete-btn {
-            background: #ef4444;
-            color: white;
-        }
-        
-        /* IP Badge */
-        .ip-badge {
-            background: #6b7280;
-            color: white;
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 40px;
-            display: inline-block;
-            margin-right: 5px;
-        }
-        
-        /* Developer Card - Fixed */
+        /* Developer Card */
         .dev-card {
             background: linear-gradient(135deg, #b45309, #d97706);
             border-radius: 40px;
@@ -274,7 +232,6 @@
             transform: rotate(15deg);
         }
         
-        /* Social Icons - Fixed */
         .dev-card .social-icons {
             display: flex;
             justify-content: center;
@@ -349,33 +306,35 @@
             background: #0f172a;
         }
         
-        /* Edit Modal */
-        #edit-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .edit-modal-content {
-            background: white;
+        /* Vote Button */
+        .vote-btn {
+            background: #f59e0b;
+            color: white;
+            padding: 10px 20px;
             border-radius: 40px;
-            padding: 30px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 14px;
         }
         
-        .dark .edit-modal-content {
-            background: #1f2937;
+        .vote-btn.true {
+            background: #10b981;
         }
         
-        /* Share Button */
+        .vote-btn.false {
+            background: #ef4444;
+        }
+        
+        .vote-btn.voted {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
         .share-btn {
             background: #25D366;
             color: white;
@@ -395,7 +354,6 @@
             transform: scale(1.05);
         }
         
-        /* WhatsApp Share Text */
         .whatsapp-share-text {
             background: rgba(37, 211, 102, 0.2);
             padding: 15px 20px;
@@ -413,13 +371,6 @@
             transform: scale(1.02);
         }
 
-        /* Required field indicator */
-        .required-field::after {
-            content: " *";
-            color: #ef4444;
-            font-weight: bold;
-        }
-        
         .google-maps-btn {
             background: #4285F4;
             color: white;
@@ -439,7 +390,6 @@
             transform: scale(1.05);
         }
 
-        /* Food Type Badge */
         .food-badge {
             display: inline-block;
             padding: 4px 12px;
@@ -469,6 +419,86 @@
             background: #6b7280;
             color: white;
         }
+        
+        /* Map Selection Mode */
+        .selection-mode {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #b45309;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            z-index: 1000;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 3px solid #fbbf24;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        /* Truth Score Bar */
+        .truth-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .truth-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #f59e0b);
+            transition: width 0.3s ease;
+        }
+        
+        .vote-counts {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .true-count {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .false-count {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        
+        .rank-badge {
+            background: #b45309;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .rank-1 {
+            background: #ffd700;
+            color: #000;
+        }
+        
+        .rank-2 {
+            background: #c0c0c0;
+            color: #000;
+        }
+        
+        .rank-3 {
+            background: #cd7f32;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -490,20 +520,16 @@
     const database = firebase.database();
     const DB_REF = database.ref('iftar-locations');
     
-    const ADMIN_SECRET = "";
-    const urlParams = new URLSearchParams(window.location.search);
-    const isAdmin = urlParams.get("admin") === ADMIN_SECRET;
-    
     // Developer WhatsApp Number
     const DEV_WHATSAPP = "8801912933572";
     const DEV_NAME = "KAKAROTBD";
     
-    // Bangladesh Bounds for Map
+    // Bangladesh Bounds
     const BANGLADESH_BOUNDS = {
-        north: 26.638,  // Tetulia
-        south: 20.743,  // Teknaf
-        west: 88.041,   // Meherpur
-        east: 92.673    // Bandarban
+        north: 26.638,
+        south: 20.743,
+        west: 88.041,
+        east: 92.673
     };
 </script>
 
@@ -524,8 +550,7 @@
     <div class="bg-white dark:bg-gray-800 rounded-[40px] p-8 max-w-md w-full border-4 border-amber-700">
         <div class="arabic text-4xl text-amber-700 mb-4 text-center">اللہ</div>
         <h3 class="text-2xl font-bold mb-4 text-amber-800 dark:text-amber-300 text-center" id="confirm-title">নিশ্চিতকরণ</h3>
-        <p class="text-gray-700 dark:text-gray-300 mb-6 text-center" id="confirm-msg">এই মসজিদে ইফতার দেওয়া হয় কি না আপনি কি নিশ্চিত?</p>
-        <p class="text-xs text-amber-600 mb-6 text-center" id="confirm-warning">গুগল ম্যাপ লিংক সঠিক না হলে সাবমিট হবে না।</p>
+        <p class="text-gray-700 dark:text-gray-300 mb-6 text-center" id="confirm-msg">আপনি কি নিশ্চিত?</p>
         <div class="flex gap-3">
             <button onclick="hideConfirmModal()" class="flex-1 py-3 rounded-full border-2 border-amber-700 text-amber-700 dark:text-amber-400 font-bold" id="confirm-cancel">বাতিল</button>
             <button onclick="submitData()" class="flex-1 py-3 rounded-full bg-amber-700 text-white font-bold" id="confirm-yes">নিশ্চিত</button>
@@ -533,47 +558,15 @@
     </div>
 </div>
 
-<!-- Edit Modal -->
-<div id="edit-modal">
-    <div class="edit-modal-content">
-        <h2 class="text-2xl font-bold text-amber-700 mb-4" id="edit-title">তথ্য সম্পাদনা করুন</h2>
-        
-        <div class="space-y-4">
-            <input type="text" id="edit-mosque-name" placeholder="মসজিদের নাম *" 
-                class="w-full p-3 border-2 border-amber-700 rounded-xl">
-            
-            <input type="url" id="edit-google-map-link" placeholder="গুগল ম্যাপ লিংক *" 
-                class="w-full p-3 border-2 border-amber-700 rounded-xl">
-            
-            <input type="text" id="edit-area-name" placeholder="এলাকা/ঠিকানা *" 
-                class="w-full p-3 border-2 border-amber-700 rounded-xl">
-            
-            <select id="edit-district" class="w-full p-3 border-2 border-amber-700 rounded-xl">
-                <option value="">জেলা নির্বাচন করুন *</option>
-            </select>
-            
-            <select id="edit-food-type" class="w-full p-3 border-2 border-amber-700 rounded-xl">
-                <option value="ইফতার">ইফতার</option>
-                <option value="বিরিয়ানি">বিরিয়ানি</option>
-                <option value="কাচ্চি">কাচ্চি</option>
-                <option value="ইফতার + বিরিয়ানি">ইফতার + বিরিয়ানি</option>
-                <option value="ইফতার + কাচ্চি">ইফতার + কাচ্চি</option>
-                <option value="অন্যান্য">অন্যান্য</option>
-            </select>
-            
-            <textarea id="edit-description" placeholder="বিশেষ তথ্য" 
-                class="w-full p-3 border-2 border-amber-700 rounded-xl h-24"></textarea>
-            
-            <div class="flex gap-3">
-                <button onclick="hideEditModal()" class="flex-1 py-3 border-2 border-amber-700 rounded-xl font-bold">বাতিল</button>
-                <button onclick="saveEdit()" class="flex-1 py-3 bg-amber-700 text-white rounded-xl font-bold">সেভ করুন</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Map -->
 <div id="map" onclick="resetMapView()"></div>
+
+<!-- Map Selection Mode Indicator -->
+<div id="selection-mode" class="selection-mode hidden">
+    <i class="fa-solid fa-map-pin"></i> 
+    <span id="selection-text">মানচিত্রে লোকেশন নির্বাচন করুন</span>
+    <button onclick="cancelMapSelection()" class="ml-4 bg-white text-amber-700 px-3 py-1 rounded-full text-sm">বাতিল</button>
+</div>
 
 <!-- Header -->
 <div class="bg-amber-700 text-white py-4 px-4 sticky top-0 z-50 shadow-lg" style="background: linear-gradient(135deg, #b45309 0%, #92400e 100%);">
@@ -594,7 +587,7 @@
     </div>
 </div>
 
-<!-- WhatsApp Share Banner - Fixed -->
+<!-- WhatsApp Share Banner -->
 <div class="max-w-4xl mx-auto px-4 mt-4">
     <div onclick="shareWebsite()" class="whatsapp-share-text text-center">
         <i class="fa-brands fa-whatsapp text-2xl mr-2" style="color: #25D366;"></i>
@@ -633,13 +626,12 @@
     <!-- Posts Container -->
     <div id="post-container" class="space-y-4"></div>
     
-    <!-- Developer Card - Fixed with Social Icons -->
+    <!-- Developer Card -->
     <div class="dev-card">
         <div class="arabic text-3xl mb-2">﷽</div>
         <p class="text-sm uppercase tracking-wider opacity-90" id="dev-by">নির্মাণে</p>
         <h2 class="text-3xl font-black mb-2">KAKAROTBD</h2>        
         
-        <!-- Fixed Social Icons -->
         <div class="social-icons">
             <a href="https://facebook.com/kakarotbd" target="_blank" title="Facebook">
                 <i class="fa-brands fa-facebook-f"></i>
@@ -656,17 +648,17 @@
     </div>
 </div>
 
-<!-- Add Button - Fixed Position -->
-<div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-40" style="margin-bottom: 0;">
+<!-- Add Button -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-40">
     <button onclick="toggleForm()" class="w-full bg-amber-700 text-white font-black py-5 rounded-full shadow-2xl flex items-center justify-center gap-3 border-4 border-amber-300 dark:border-amber-600 active:scale-95 transition-all text-lg">
         <i class="fa-solid fa-plus-circle fa-xl"></i> 
         <span id="add-btn">ইফতার স্পট যোগ করুন</span>
     </button>
 </div>
 
-<!-- Add Form Modal - Fixed to show submit button -->
-<div id="add-form" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md flex items-end justify-center z-[100] overflow-y-auto" style="padding-bottom: 20px;">
-    <div class="bg-white dark:bg-gray-800 w-full max-w-md p-6 rounded-t-[3rem] max-h-[85vh] overflow-y-auto" style="margin-bottom: 0;">
+<!-- Add Form Modal -->
+<div id="add-form" class="hidden fixed inset-0 bg-black/90 backdrop-blur-md flex items-end justify-center z-[100] overflow-y-auto">
+    <div class="bg-white dark:bg-gray-800 w-full max-w-md p-6 rounded-t-[3rem] max-h-[85vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6 sticky top-0 bg-white dark:bg-gray-800 pt-2 z-10">
             <h2 class="text-2xl font-bold text-amber-700" id="form-title">➕ নতুন তথ্য দিন</h2>
             <button onclick="toggleForm()" class="text-4xl text-amber-700">&times;</button>
@@ -675,7 +667,17 @@
         <div class="space-y-4 pb-4">
             <div class="bg-amber-50 dark:bg-gray-700 p-4 rounded-2xl border-2 border-amber-700 text-center text-sm" id="form-warning">
                 <i class="fa-solid fa-circle-info text-amber-700 mr-2"></i>
-                আপনি কি নিশ্চিত এই মসজিদে ইফতার দেওয়া হয়?
+                মানচিত্রে ক্লিক করে সঠিক লোকেশন নির্বাচন করুন
+            </div>
+            
+            <button onclick="startMapSelection()" type="button" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span id="select-location-btn">মানচিত্রে লোকেশন নির্বাচন করুন</span>
+            </button>
+            
+            <div id="selected-coords" class="hidden bg-green-100 dark:bg-green-900 p-3 rounded-xl text-sm text-center">
+                <i class="fa-solid fa-check-circle text-green-600"></i>
+                <span id="coords-display"></span>
             </div>
             
             <input id="user-name" type="text" 
@@ -719,8 +721,7 @@
                 </p>
             </div>
             
-            <!-- Submit Button - Always Visible -->
-            <button onclick="showConfirmModal()" class="w-full bg-amber-700 text-white py-5 rounded-2xl font-black text-lg border-2 border-amber-500 sticky bottom-0 mt-4 shadow-lg">
+            <button onclick="showConfirmModal()" class="w-full bg-amber-700 text-white py-5 rounded-2xl font-black text-lg border-2 border-amber-500 mt-4 shadow-lg">
                 <span id="submit-btn">জমা দিন</span>
             </button>
         </div>
@@ -729,19 +730,25 @@
 
 <!-- Islamic Quote Floating -->
 <div id="islamic-quote" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-amber-700 text-white px-6 py-3 rounded-full shadow-lg text-center text-sm font-medium z-30 whitespace-nowrap max-w-[90%] border-2 border-amber-300">
-    <!-- Dynamic Quote -->
 </div>
 
 <script>
     // ==================== LANGUAGE SYSTEM ====================
     let currentLang = 'bn';
+    let map, markersLayer, userLocation = { lat: 23.6850, lng: 90.3563 };
+    let allPosts = [];
+    let pendingData = null;
+    let selectedDistrict = '';
+    let userIP = '';
+    let mapInitialized = false;
+    let mapSelectionCallback = null;
+    let userVotes = {}; // Store user votes { postId: 'true'/'false' }
     
     function setLanguage(lang) {
         currentLang = lang;
         document.getElementById('lang-bn').classList.toggle('active', lang === 'bn');
         document.getElementById('lang-en').classList.toggle('active', lang === 'en');
         
-        // Update all text content based on language
         const translations = {
             'header-title': { bn: 'ইফতার ফাইন্ডার', en: 'Iftar Finder' },
             'header-sub': { bn: 'কোন মসজিদে ইফতার দেয়?', en: 'Which mosques serve iftar?' },
@@ -749,19 +756,19 @@
             'stats-active': { bn: 'সক্রিয়', en: 'Active' },
             'add-btn': { bn: 'ইফতার স্পট যোগ করুন', en: 'Add Iftar Spot' },
             'form-title': { bn: '➕ নতুন তথ্য দিন', en: '➕ Add New Info' },
-            'form-warning': { bn: 'আপনি কি নিশ্চিত এই মসজিদে ইফতার দেওয়া হয়?', en: 'Are you sure iftar is served here?' },
+            'form-warning': { bn: 'মানচিত্রে ক্লিক করে সঠিক লোকেশন নির্বাচন করুন', en: 'Click on map to select exact location' },
+            'select-location-btn': { bn: 'মানচিত্রে লোকেশন নির্বাচন করুন', en: 'Select Location on Map' },
             'district-label': { bn: 'জেলা নির্বাচন করুন *', en: 'Select District *' },
             'submit-btn': { bn: 'জমা দিন', en: 'Submit' },
             'final-warning': { bn: 'মনে রাখবেন: আপনি যে তথ্য দিচ্ছেন তা সঠিক কিনা নিশ্চিত হোন। মিথ্যা তথ্য দেওয়া ইসলামী দৃষ্টিতে সমর্থনযোগ্য নয়।', en: 'Remember: Make sure the information you are providing is accurate. Providing false information is not permissible in Islamic terms.' },
             'confirm-title': { bn: 'নিশ্চিতকরণ', en: 'Confirmation' },
-            'confirm-msg': { bn: 'এই মসজিদে ইফতার দেওয়া হয় কি না আপনি কি নিশ্চিত?', en: 'Are you sure iftar is served here?' },
-            'confirm-warning': { bn: 'গুগল ম্যাপ লিংক সঠিক না হলে সাবমিট হবে না।', en: 'Invalid Google Map link will not be submitted.' },
+            'confirm-msg': { bn: 'আপনি কি নিশ্চিত?', en: 'Are you sure?' },
             'confirm-cancel': { bn: 'বাতিল', en: 'Cancel' },
             'confirm-yes': { bn: 'নিশ্চিত', en: 'Confirm' },
             'dev-by': { bn: 'নির্মাণে', en: 'Developed by' },
             'dev-message': { bn: 'ইফতারের লোকেশন শেয়ার করুন। আপনার একটি ছোট উদ্যোগ হাজারো মানুষের উপকারে আসতে পারে এবং এর মাধ্যমে আপনি সওয়াব অর্জন করতে পারেন।', en: 'Please share your Iftar location. Your small initiative can help thousands of people and become a source of reward for you' },
             'share-banner-text': { bn: '🔹 এই সাইটটি মসজিদে ইফতার কোথায় দেয় তা জানার জন্য তৈরি করা হয়েছে। বেশি বেশি শেয়ার করে অন্যদের সাহায্য করুন 🔹', en: '🔹 This site helps find iftar locations at mosques. Share to help others 🔹' },
-            'edit-title': { bn: 'তথ্য সম্পাদনা করুন', en: 'Edit Information' }
+            'selection-text': { bn: 'মানচিত্রে লোকেশন নির্বাচন করুন', en: 'Select location on map' }
         };
         
         for (let [id, texts] of Object.entries(translations)) {
@@ -769,16 +776,12 @@
             if (element) element.innerText = texts[lang];
         }
         
-        // Update placeholders
         document.getElementById('search-input').placeholder = lang === 'bn' ? 'মসজিদ/এলাকা খুঁজুন...' : 'Search mosque/area...';
         document.getElementById('user-name').placeholder = lang === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your name (optional)';
         document.getElementById('mosque-name').placeholder = lang === 'bn' ? 'মসজিদের নাম *' : 'Mosque name *';
         document.getElementById('google-map-link').placeholder = lang === 'bn' ? 'গুগল ম্যাপ লিংক *' : 'Google Map link *';
         document.getElementById('area-name').placeholder = lang === 'bn' ? 'এলাকা/ঠিকানা *' : 'Area/Address *';
         document.getElementById('loc-desc').placeholder = lang === 'bn' ? 'বিশেষ তথ্য (ঐচ্ছিক)...' : 'Additional info (optional)...';
-        document.getElementById('edit-mosque-name').placeholder = lang === 'bn' ? 'মসজিদের নাম *' : 'Mosque name *';
-        document.getElementById('edit-google-map-link').placeholder = lang === 'bn' ? 'গুগল ম্যাপ লিংক *' : 'Google Map link *';
-        document.getElementById('edit-area-name').placeholder = lang === 'bn' ? 'এলাকা/ঠিকানা *' : 'Area/Address *';
         
         applyFilters();
     }
@@ -798,15 +801,6 @@
     
     const UNIQUE_DISTRICTS = [...new Set(BANGLADESH_DISTRICTS)].sort((a, b) => a.localeCompare(b, 'bn'));
     
-    // ==================== STATE ====================
-    let map, markersLayer, userLocation = { lat: 23.6850, lng: 90.3563 };
-    let allPosts = [];
-    let pendingData = null;
-    let selectedDistrict = '';
-    let currentEditId = null;
-    let userIP = '';
-    let mapInitialized = false;
-    
     // ==================== GET USER IP ====================
     async function getUserIP() {
         try {
@@ -815,6 +809,12 @@
             userIP = data.ip;
         } catch (error) {
             userIP = 'unknown-' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        // Load user votes from localStorage
+        const savedVotes = localStorage.getItem(`votes_${userIP}`);
+        if (savedVotes) {
+            userVotes = JSON.parse(savedVotes);
         }
     }
     
@@ -826,6 +826,119 @@
             : `🕌 Assalamu Alaikum! \n\nThis website helps find iftar locations at mosques in Bangladesh.\n\nYou can also add information about mosques in your area.\n\n🔗 Link: ${siteUrl}\n\nPlease share so more people can benefit. Jazakallah Khairan! 🤲`;
         
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+    
+    // ==================== TRUTH/ FALSE VOTE SYSTEM ====================
+    async function votePost(postId, voteValue) {
+        if (!userIP) await getUserIP();
+        
+        // Check if already voted for this post
+        if (userVotes[postId]) {
+            alert(currentLang === 'bn' ? 'আপনি ইতিমধ্যে এই পোস্টে ভোট দিয়েছেন' : 'You have already voted for this post');
+            return;
+        }
+        
+        // Check if voted for any post (one vote per IP across all posts)
+        const hasVoted = Object.keys(userVotes).length > 0;
+        if (hasVoted) {
+            alert(currentLang === 'bn' ? 'আপনি ইতিমধ্যে একটি পোস্টে ভোট দিয়েছেন। আপনি শুধুমাত্র একটি পোস্টে ভোট দিতে পারবেন।' : 'You have already voted for one post. You can only vote for one post.');
+            return;
+        }
+        
+        try {
+            // Get current post data
+            const postRef = DB_REF.child(postId);
+            const snapshot = await postRef.get();
+            const post = snapshot.val();
+            
+            // Update vote counts
+            const trueVotes = (post.trueVotes || 0) + (voteValue === 'true' ? 1 : 0);
+            const falseVotes = (post.falseVotes || 0) + (voteValue === 'false' ? 1 : 0);
+            const totalVotes = trueVotes + falseVotes;
+            
+            // Calculate truth score (percentage of true votes)
+            const truthScore = totalVotes > 0 ? (trueVotes / totalVotes) * 100 : 0;
+            
+            // Update post
+            await postRef.update({
+                trueVotes: trueVotes,
+                falseVotes: falseVotes,
+                totalVotes: totalVotes,
+                truthScore: truthScore
+            });
+            
+            // Record user vote
+            userVotes[postId] = voteValue;
+            localStorage.setItem(`votes_${userIP}`, JSON.stringify(userVotes));
+            
+            alert(currentLang === 'bn' ? 'ভোট দেওয়া হয়েছে! ধন্যবাদ।' : 'Vote submitted! Thank you.');
+            
+        } catch (error) {
+            console.error('Vote error:', error);
+            alert(currentLang === 'bn' ? 'ভোট দিতে সমস্যা হয়েছে' : 'Error submitting vote');
+        }
+    }
+    
+    // ==================== MAP SELECTION ====================
+    function startMapSelection() {
+        if (!mapInitialized) initMap();
+        
+        document.getElementById('selection-mode').classList.remove('hidden');
+        document.getElementById('add-form').classList.add('hidden');
+        
+        // Enable map click selection
+        map.on('click', onMapSelect);
+        
+        // Change cursor
+        map.getContainer().style.cursor = 'crosshair';
+    }
+    
+    function onMapSelect(e) {
+        const { lat, lng } = e.latlng;
+        
+        // Check if within Bangladesh
+        if (lat < BANGLADESH_BOUNDS.south || lat > BANGLADESH_BOUNDS.north || 
+            lng < BANGLADESH_BOUNDS.west || lng > BANGLADESH_BOUNDS.east) {
+            alert(currentLang === 'bn' ? 'দয়া করে বাংলাদেশের ভিতরে লোকেশন নির্বাচন করুন' : 'Please select a location within Bangladesh');
+            return;
+        }
+        
+        // Store coordinates
+        window.selectedLat = lat;
+        window.selectedLng = lng;
+        
+        // Show selected coordinates
+        document.getElementById('selected-coords').classList.remove('hidden');
+        document.getElementById('coords-display').innerHTML = `📍 নির্বাচিত: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        
+        // Add temporary marker
+        if (window.tempMarker) {
+            map.removeLayer(window.tempMarker);
+        }
+        
+        window.tempMarker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: 'custom-marker',
+                html: '📍',
+                iconSize: [36, 36]
+            })
+        }).addTo(map);
+        
+        // Fly to location
+        map.flyTo([lat, lng], 16);
+        
+        // Hide selection mode and show form
+        cancelMapSelection();
+        document.getElementById('add-form').classList.remove('hidden');
+        
+        // Show success message
+        alert(currentLang === 'bn' ? 'লোকেশন নির্বাচন করা হয়েছে!' : 'Location selected!');
+    }
+    
+    function cancelMapSelection() {
+        document.getElementById('selection-mode').classList.add('hidden');
+        map.off('click', onMapSelect);
+        map.getContainer().style.cursor = '';
     }
     
     // ==================== INITIALIZE ====================
@@ -857,16 +970,6 @@
             option.innerText = district;
             select.appendChild(option);
         });
-        
-        // Also populate edit modal district select
-        const editSelect = document.getElementById('edit-district');
-        editSelect.innerHTML = '<option value="">জেলা নির্বাচন করুন</option>';
-        UNIQUE_DISTRICTS.forEach(district => {
-            const option = document.createElement('option');
-            option.value = district;
-            option.innerText = district;
-            editSelect.appendChild(option);
-        });
     }
     
     function initMap() {
@@ -884,7 +987,6 @@
             attribution: '© OpenStreetMap'
         }).addTo(map);
         
-        // Add Bangladesh boundary highlight
         L.rectangle([
             [BANGLADESH_BOUNDS.south, BANGLADESH_BOUNDS.west],
             [BANGLADESH_BOUNDS.north, BANGLADESH_BOUNDS.east]
@@ -902,7 +1004,6 @@
                 (pos) => {
                     userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                     
-                    // Check if within Bangladesh bounds
                     if (userLocation.lat >= BANGLADESH_BOUNDS.south && 
                         userLocation.lat <= BANGLADESH_BOUNDS.north &&
                         userLocation.lng >= BANGLADESH_BOUNDS.west && 
@@ -928,9 +1029,8 @@
         });
     }
     
-    // ==================== VALIDATE GOOGLE MAP LINK ====================
     function isValidGoogleMapLink(link) {
-        if (!link || link.trim() === '') return false; // Now required
+        if (!link || link.trim() === '') return false;
         
         const patterns = [
             /^https?:\/\/(www\.)?google\.com\/maps\/.*$/i,
@@ -941,14 +1041,23 @@
         return patterns.some(pattern => pattern.test(link));
     }
     
-    // ==================== LOAD DATA ====================
     function loadData() {
-        DB_REF.on('value', (snapshot) => {
+        DB_REF.on('value', async (snapshot) => {
             const data = snapshot.val();
             allPosts = data ? Object.keys(data).map(key => ({
                 id: key,
-                ...data[key]
-            })).sort((a, b) => b.timestamp - a.timestamp) : []; // Sort by newest first
+                ...data[key],
+                trueVotes: data[key].trueVotes || 0,
+                falseVotes: data[key].falseVotes || 0,
+                totalVotes: data[key].totalVotes || 0,
+                truthScore: data[key].truthScore || 0
+            })) : [];
+            
+            // Sort by truth score (highest first) then by total votes
+            allPosts.sort((a, b) => {
+                if (b.truthScore !== a.truthScore) return b.truthScore - a.truthScore;
+                return (b.totalVotes || 0) - (a.totalVotes || 0);
+            });
             
             document.getElementById('total-submits').innerText = allPosts.length;
             applyFilters();
@@ -965,15 +1074,20 @@
         }, 1500);
     }
     
-    // ==================== FILTERS ====================
     function applyFilters() {
         const searchTerm = document.getElementById('search-input').value.toLowerCase();
         const district = document.getElementById('district-filter').value;
         
-        const filtered = allPosts.filter(post => {
+        let filtered = allPosts.filter(post => {
             const matchSearch = (post.mosqueName + ' ' + post.area + ' ' + (post.description || '')).toLowerCase().includes(searchTerm);
             const matchDistrict = !district || post.district === district;
             return matchSearch && matchDistrict;
+        });
+        
+        // Sort filtered results by truth score
+        filtered.sort((a, b) => {
+            if (b.truthScore !== a.truthScore) return b.truthScore - a.truthScore;
+            return (b.totalVotes || 0) - (a.totalVotes || 0);
         });
         
         renderPosts(filtered);
@@ -981,10 +1095,8 @@
         document.getElementById('active-count').innerText = filtered.length;
     }
     
-    // ==================== GET FOOD BADGE CLASS ====================
     function getFoodBadgeClass(foodType) {
         if (!foodType) return 'food-others';
-        
         if (foodType.includes('ইফতার') && !foodType.includes('+')) return 'food-iftar';
         if (foodType.includes('বিরিয়ানি') || foodType.includes('বিরিয়ানি')) return 'food-biryani';
         if (foodType.includes('কাচ্চি')) return 'food-kacchi';
@@ -992,7 +1104,6 @@
         return 'food-others';
     }
     
-    // ==================== RENDER POSTS ====================
     function renderPosts(posts) {
         const container = document.getElementById('post-container');
         container.innerHTML = '';
@@ -1007,33 +1118,24 @@
             return;
         }
         
-        posts.forEach(post => {
+        posts.forEach((post, index) => {
             const date = new Date(post.timestamp);
             const formattedDate = date.toLocaleDateString('bn-BD', {day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit'});
             
-            // Check if current user is the owner (by IP)
-            const isOwner = post.userIP === userIP;
             const foodBadgeClass = getFoodBadgeClass(post.foodType);
+            const hasVoted = userVotes[post.id];
+            const userVoteValue = userVotes[post.id];
+            const truePercentage = post.truthScore || 0;
+            const falsePercentage = 100 - truePercentage;
+            
+            const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
             
             container.innerHTML += `
-                <div class="mosque-card" onclick="focusMapToLocation(${post.lat || 23.6850}, ${post.lng || 90.3563}, '${post.mosqueName.replace(/'/g, "\\'")}', '${post.googleMapLink.replace(/'/g, "\\'")}')" data-post-id="${post.id}">
-                    <div class="owner-controls" onclick="event.stopPropagation()">
-                        ${isAdmin || isOwner ? `
-                            <button onclick="editPost('${post.id}')" class="edit-btn">
-                                <i class="fa-solid fa-pen"></i> ${currentLang === 'bn' ? 'এডিট' : 'Edit'}
-                            </button>
-                            <button onclick="deletePost('${post.id}')" class="delete-btn">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                    
-                    <div class="flex justify-between items-start mb-3">
+                <div class="mosque-card" onclick="focusMapToLocation(${post.lat || 0}, ${post.lng || 0}, '${post.mosqueName.replace(/'/g, "\\'")}', '${post.googleMapLink.replace(/'/g, "\\'")}')">
+                    <div class="flex items-center mb-3">
+                        <div class="rank-badge ${rankClass}">#${index + 1}</div>
                         <span class="bg-amber-700 text-white text-xs px-3 py-1 rounded-full">
                             <i class="fa-solid fa-location-dot"></i> ${post.district}
-                        </span>
-                        <span class="food-badge ${foodBadgeClass}">
-                            🍽️ ${post.foodType || 'ইফতার'}
                         </span>
                     </div>
                     
@@ -1049,9 +1151,42 @@
                         <span class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm px-4 py-2 rounded-full">
                             👤 ${post.userName || 'বেনামী'}
                         </span>
+                        <span class="food-badge ${foodBadgeClass}">
+                            🍽️ ${post.foodType || 'ইফতার'}
+                        </span>
                     </div>
                     
                     ${post.description ? `<p class="text-sm mb-4 bg-amber-50 dark:bg-gray-700 p-3 rounded-xl">📝 ${post.description}</p>` : ''}
+                    
+                    <!-- Truth Score Bar -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="true-count"><i class="fa-solid fa-check-circle"></i> সঠিক: ${post.trueVotes || 0}</span>
+                            <span class="false-count"><i class="fa-solid fa-times-circle"></i> ভুল: ${post.falseVotes || 0}</span>
+                        </div>
+                        <div class="truth-bar">
+                            <div class="truth-fill" style="width: ${truePercentage}%"></div>
+                        </div>
+                        <div class="text-center text-xs mt-1 font-bold">
+                            নির্ভুলতা: ${truePercentage.toFixed(1)}% (${post.totalVotes || 0} ভোট)
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2 mb-3" onclick="event.stopPropagation()">
+                        ${!hasVoted ? `
+                            <button onclick="votePost('${post.id}', 'true')" class="vote-btn true flex-1">
+                                <i class="fa-solid fa-check-circle"></i> সঠিক
+                            </button>
+                            <button onclick="votePost('${post.id}', 'false')" class="vote-btn false flex-1">
+                                <i class="fa-solid fa-times-circle"></i> ভুল
+                            </button>
+                        ` : `
+                            <div class="vote-btn voted flex-1 ${userVoteValue === 'true' ? 'true' : 'false'}">
+                                <i class="fa-solid ${userVoteValue === 'true' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                                ${userVoteValue === 'true' ? 'সঠিক' : 'ভুল'} - ধন্যবাদ
+                            </div>
+                        `}
+                    </div>
                     
                     <div class="flex gap-2" onclick="event.stopPropagation()">
                         <a href="${post.googleMapLink}" target="_blank" class="flex-1 bg-blue-600 text-white py-4 rounded-full text-sm font-bold text-center google-maps-btn">
@@ -1064,41 +1199,25 @@
                     
                     <div class="text-[10px] text-gray-400 mt-3 text-center">
                         🕒 ${formattedDate}
+                        ${post.lat ? '📍 মানচিত্রে সংরক্ষিত' : ''}
                     </div>
                 </div>
             `;
         });
     }
     
-    // ==================== MAP FOCUS FUNCTION ====================
     function focusMapToLocation(lat, lng, mosqueName, googleMapLink) {
-        if (!mapInitialized) {
-            initMap();
-        }
+        if (!mapInitialized) initMap();
         
-        // Scroll to map smoothly
         document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
         
         if (lat && lng && lat !== 0 && lng !== 0) {
-            // Zoom to location with animation
-            map.flyTo([lat, lng], 16, {
-                animate: true,
-                duration: 2
-            });
-            
-            // Add zoomed class to map
+            map.flyTo([lat, lng], 16, { animate: true, duration: 2 });
             document.getElementById('map').classList.add('zoomed');
-            
-            // Remove previous popups
             map.closePopup();
             
-            // Show popup after animation
             setTimeout(() => {
-                L.popup({ 
-                    closeButton: true,
-                    autoClose: true,
-                    className: 'custom-popup'
-                })
+                L.popup({ closeButton: true, autoClose: true })
                 .setLatLng([lat, lng])
                 .setContent(`
                     <div style="text-align: center; min-width: 200px;">
@@ -1111,22 +1230,17 @@
                 .openOn(map);
             }, 500);
         } else {
-            // If no coordinates, just open Google Maps directly
             window.open(googleMapLink, '_blank');
         }
     }
     
     function resetMapView() {
         if (map) {
-            map.flyTo([23.6850, 90.3563], 7, {
-                animate: true,
-                duration: 1.5
-            });
+            map.flyTo([23.6850, 90.3563], 7, { animate: true, duration: 1.5 });
             document.getElementById('map').classList.remove('zoomed');
         }
     }
     
-    // ==================== UPDATE MAP ====================
     function updateMap(posts) {
         if (!map || !markersLayer) return;
         
@@ -1149,6 +1263,8 @@
                         <span style="display:inline-block; margin-top:5px; padding:3px 10px; background:${post.foodType === 'ইফতার' ? '#f59e0b' : post.foodType === 'বিরিয়ানি' ? '#10b981' : post.foodType === 'কাচ্চি' ? '#8b5cf6' : '#6b7280'}; color:white; border-radius:15px; font-size:11px;">
                             🍽️ ${post.foodType || 'ইফতার'}
                         </span><br>
+                        <span style="font-size:12px; font-weight:bold;">নির্ভুলতা: ${(post.truthScore || 0).toFixed(1)}%</span><br>
+                        <span style="font-size:11px;">✅ ${post.trueVotes || 0} | ❌ ${post.falseVotes || 0}</span><br>
                         <a href="${post.googleMapLink}" target="_blank" style="display:inline-block; margin-top:8px; padding:5px 15px; background:#4285F4; color:white; text-decoration:none; border-radius:20px; font-size:12px; font-weight:bold;">
                             <i class="fa-brands fa-google"></i> Google Maps
                         </a>
@@ -1162,68 +1278,6 @@
         });
     }
     
-    // ==================== EDIT POST ====================
-    function editPost(id) {
-        const post = allPosts.find(p => p.id === id);
-        if (!post) return;
-        
-        currentEditId = id;
-        
-        document.getElementById('edit-mosque-name').value = post.mosqueName || '';
-        document.getElementById('edit-google-map-link').value = post.googleMapLink || '';
-        document.getElementById('edit-area-name').value = post.area || '';
-        document.getElementById('edit-district').value = post.district || '';
-        document.getElementById('edit-food-type').value = post.foodType || 'ইফতার';
-        document.getElementById('edit-description').value = post.description || '';
-        
-        document.getElementById('edit-modal').style.display = 'flex';
-    }
-    
-    function hideEditModal() {
-        document.getElementById('edit-modal').style.display = 'none';
-        currentEditId = null;
-    }
-    
-    async function saveEdit() {
-        if (!currentEditId) return;
-        
-        const mosqueName = document.getElementById('edit-mosque-name').value;
-        const area = document.getElementById('edit-area-name').value;
-        const district = document.getElementById('edit-district').value;
-        const googleMapLink = document.getElementById('edit-google-map-link').value;
-        
-        if (!mosqueName || !area || !district) {
-            alert(currentLang === 'bn' ? 'সব তথ্য দিন' : 'Fill all required fields');
-            return;
-        }
-        
-        if (!googleMapLink || !isValidGoogleMapLink(googleMapLink)) {
-            alert(currentLang === 'bn' ? 'গুগল ম্যাপ লিংক আবশ্যক এবং সঠিক হতে হবে' : 'Google Map link is required and must be valid');
-            return;
-        }
-        
-        const updates = {
-            mosqueName: mosqueName,
-            area: area,
-            district: district,
-            googleMapLink: googleMapLink,
-            foodType: document.getElementById('edit-food-type').value,
-            description: document.getElementById('edit-description').value,
-            editedAt: Date.now()
-        };
-        
-        await DB_REF.child(currentEditId).update(updates);
-        hideEditModal();
-    }
-    
-    // ==================== DELETE POST ====================
-    async function deletePost(id) {
-        if (!confirm(currentLang === 'bn' ? 'নিশ্চিতভাবে মুছে ফেলবেন?' : 'Confirm delete?')) return;
-        
-        await DB_REF.child(id).remove();
-    }
-    
-    // ==================== SHARE POST ====================
     function sharePost(name, area) {
         const siteUrl = window.location.href;
         let text = currentLang === 'bn' 
@@ -1233,7 +1287,6 @@
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     }
     
-    // ==================== SUBMIT NEW POST ====================
     function showConfirmModal() {
         const mosque = document.getElementById('mosque-name').value;
         const area = document.getElementById('area-name').value;
@@ -1244,7 +1297,6 @@
             return;
         }
         
-        // Validate Google Map link - now required
         if (!googleMapLink || !isValidGoogleMapLink(googleMapLink)) {
             alert(currentLang === 'bn' ? 'গুগল ম্যাপ লিংক আবশ্যক এবং সঠিক হতে হবে' : 'Google Map link is required and must be valid');
             return;
@@ -1261,9 +1313,13 @@
             foodType: document.getElementById('food-type').value,
             description: document.getElementById('loc-desc').value,
             timestamp: Date.now(),
-            lat: userLocation.lat,
-            lng: userLocation.lng,
-            userIP: userIP
+            lat: window.selectedLat || userLocation.lat,
+            lng: window.selectedLng || userLocation.lng,
+            userIP: userIP,
+            trueVotes: 0,
+            falseVotes: 0,
+            totalVotes: 0,
+            truthScore: 0
         };
     }
     
@@ -1279,24 +1335,34 @@
             await DB_REF.push(pendingData);
             hideConfirmModal();
             toggleForm();
+            
+            // Clear selected coordinates
+            window.selectedLat = null;
+            window.selectedLng = null;
+            document.getElementById('selected-coords').classList.add('hidden');
+            
             alert(currentLang === 'bn' ? 'আলহামদুলিল্লাহ! তথ্য সফলভাবে জমা হয়েছে।' : 'Alhamdulillah! Information submitted successfully.');
         } catch (err) {
             alert(currentLang === 'bn' ? 'জমা দিতে সমস্যা হয়েছে' : 'Error submitting data');
         }
     }
     
-    // ==================== UI UTILITIES ====================
     function toggleForm() {
         const form = document.getElementById('add-form');
         form.classList.toggle('hidden');
         if (!form.classList.contains('hidden')) {
-            // Reset form
             document.getElementById('mosque-name').value = '';
             document.getElementById('google-map-link').value = '';
             document.getElementById('area-name').value = '';
             document.getElementById('loc-desc').value = '';
             document.querySelectorAll('.district-btn').forEach(b => b.classList.remove('selected'));
             selectedDistrict = '';
+            
+            // Remove temp marker if exists
+            if (window.tempMarker) {
+                map.removeLayer(window.tempMarker);
+                window.tempMarker = null;
+            }
         }
     }
     
@@ -1343,9 +1409,7 @@
     }
     setInterval(updateCountdown, 1000);
     
-    // ==================== INITIALIZE ====================
     window.onload = () => {
-        if (isAdmin) document.getElementById('adminBadge').classList.remove('hidden');
         initDistrictButtons();
         initDistrictFilter();
         initMap();
