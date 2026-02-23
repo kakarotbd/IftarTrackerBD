@@ -802,7 +802,6 @@
                 <option value="কাচ্চি">কাচ্চি</option>
                 <option value="ইফতার + বিরিয়ানি">ইফতার + বিরিয়ানি</option>
                 <option value="ইফতার + কাচ্চি">ইফতার + কাচ্চি</option>
-                <option value="অন্যান্য">অন্যান্য</option>
             </select>
             
             <textarea id="loc-desc" 
@@ -1325,8 +1324,8 @@ const BANGLADESH_DISTRICTS = [
                     <!-- Truth Score Bar -->
                     <div class="mb-4">
                         <div class="flex justify-between text-sm mb-1">
-                            <span class="true-count"><i class="fa-solid fa-check-circle"></i> সঠিক: ${post.trueVotes || 0}</span>
-                            <span class="false-count"><i class="fa-solid fa-times-circle"></i> ভুল: ${post.falseVotes || 0}</span>
+                            <span class="true-count"><i class="fa-solid fa-check-circle"></i> সত্য: ${post.trueVotes || 0}</span>
+                            <span class="false-count"><i class="fa-solid fa-times-circle"></i> মিথ্যা: ${post.falseVotes || 0}</span>
                         </div>
                         <div class="truth-bar">
                             <div class="truth-fill" style="width: ${truePercentage}%"></div>
@@ -1339,15 +1338,15 @@ const BANGLADESH_DISTRICTS = [
                     <div class="flex gap-2 mb-3" onclick="event.stopPropagation()">
                         ${!hasVoted && !hasVoted ? `
                             <button onclick="votePost('${post.id}', 'true')" class="vote-btn true flex-1">
-                                <i class="fa-solid fa-check-circle"></i> সঠিক
+                                <i class="fa-solid fa-check-circle"></i> সত্য
                             </button>
                             <button onclick="votePost('${post.id}', 'false')" class="vote-btn false flex-1">
-                                <i class="fa-solid fa-times-circle"></i> ভুল
+                                <i class="fa-solid fa-times-circle"></i> মিথ্যা
                             </button>
                         ` : hasVoted ? `
                             <div class="vote-btn voted flex-1 ${userVoteValue === 'true' ? 'true' : 'false'}">
                                 <i class="fa-solid ${userVoteValue === 'true' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-                                ${userVoteValue === 'true' ? 'সঠিক' : 'ভুল'} - ধন্যবাদ
+                                ${userVoteValue === 'true' ? 'সত্য' : 'মিথ্যা'} - ধন্যবাদ
                             </div>
                         ` : `
                             <div class="vote-btn voted flex-1">
@@ -1592,3 +1591,4 @@ const BANGLADESH_DISTRICTS = [
 </script>
 </body>
 </html>
+
