@@ -78,6 +78,18 @@
         .custom-marker:hover {
             transform: scale(1.2);
         }
+
+        .selection-pin {
+            font-size: 48px;
+            filter: drop-shadow(0 8px 6px rgb(0 0 0 / 0.4));
+            transform-origin: bottom center;
+            animation: bounce 0.5s ease infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to   { transform: translateY(-8px); }
+        }
         
         .glass-card {
             background: rgba(255, 255, 255, 0.95);
@@ -499,6 +511,83 @@
             background: #cd7f32;
             color: #fff;
         }
+        
+       /* MAP SEARCH BAR - আরো ছোট + মাঝখানে */
+/* MAP SEARCH BAR - আরো LEFT + ছোট + সুন্দর */
+.leaflet-top {
+    left: 0 !important;
+    right: auto !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-start !important;   /* এটা দিয়েই left এ নিয়ে গেলাম */
+    padding: 10px 0 0 15px !important;       /* বাম দিকে ১৫px গ্যাপ */
+}
+
+.leaflet-control-search {
+    width: 78% !important;
+    max-width: 280px !important;     /* আরো ছোট করলাম */
+    height: 48px !important;
+    border-radius: 50px !important;
+    border: 3px solid #b45309 !important;
+    box-shadow: 0 6px 20px rgba(180,83,9,0.25) !important;
+    margin: 0 !important;
+    background: white;
+    overflow: hidden;
+}
+
+.leaflet-control-search .search-input {
+    padding: 12px 16px !important;
+    font-size: 14.5px !important;
+    height: 100% !important;
+}
+
+.leaflet-control-search .search-button {
+    width: 46px !important;
+    height: 100% !important;
+    font-size: 17px !important;
+}
+
+        /* Select button for map selection */
+        .select-location-btn {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            z-index: 1000;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 3px solid white;
+            text-align: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none;
+        }
+        
+        .select-location-btn:hover {
+            background: #059669;
+            transform: translateX(-50%) scale(1.05);
+        }
+        
+        .select-location-btn.show {
+            display: block;
+        }
+
+        /* Location icon styles */
+        .location-icon {
+            background: transparent;
+            border: none;
+        }
+        
+        .location-icon i {
+            font-size: 24px;
+            color: #b45309;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -561,12 +650,17 @@
 <!-- Map -->
 <div id="map" onclick="resetMapView()"></div>
 
-<!-- Map Selection Mode Indicator -->
+<!-- Map Selection Mode Indicator (with pin icon) -->
 <div id="selection-mode" class="selection-mode hidden">
-    <i class="fa-solid fa-map-pin"></i> 
+    <i class="fa-solid fa-location-dot animate-pulse"></i> 
     <span id="selection-text">মানচিত্রে লোকেশন নির্বাচন করুন</span>
     <button onclick="cancelMapSelection()" class="ml-4 bg-white text-amber-700 px-3 py-1 rounded-full text-sm">বাতিল</button>
 </div>
+
+<!-- Select Location Button (shows after map click) -->
+<button id="select-location-btn" class="select-location-btn" onclick="confirmMapSelection()">
+    <i class="fa-solid fa-check-circle"></i> <span id="select-btn-text">এই স্থান নির্বাচন করুন</span>
+</button>
 
 <!-- Header -->
 <div class="bg-amber-700 text-white py-4 px-4 sticky top-0 z-50 shadow-lg" style="background: linear-gradient(135deg, #b45309 0%, #92400e 100%);">
@@ -667,12 +761,12 @@
         <div class="space-y-4 pb-4">
             <div class="bg-amber-50 dark:bg-gray-700 p-4 rounded-2xl border-2 border-amber-700 text-center text-sm" id="form-warning">
                 <i class="fa-solid fa-circle-info text-amber-700 mr-2"></i>
-                মানচিত্রে ক্লিক করে সঠিক লোকেশন নির্বাচন করুন
+                মানচিত্রে ক্লিক করে সঠিক লোকেশন নির্বাচন করুন (পিন দেখা যাবে)
             </div>
             
             <button onclick="startMapSelection()" type="button" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
                 <i class="fa-solid fa-map-location-dot"></i>
-                <span id="select-location-btn">মানচিত্রে লোকেশন নির্বাচন করুন</span>
+                <span id="select-location-btn-text">মানচিত্রে লোকেশন নির্বাচন করুন</span>
             </button>
             
             <div id="selected-coords" class="hidden bg-green-100 dark:bg-green-900 p-3 rounded-xl text-sm text-center">
@@ -742,7 +836,10 @@
     let userIP = '';
     let mapInitialized = false;
     let mapSelectionCallback = null;
-    let userVotes = {}; // Store user votes { postId: 'true'/'false' }
+    let userVotes = {}; // Store user votes { postId: 'true'/'false' } for current IP
+    let tempPin = null;  // Permanent pin during selection
+    let tempLatLng = null; // Temporary latlng for selection
+    let hasVoted = false; // Track if user has voted on any post
     
     function setLanguage(lang) {
         currentLang = lang;
@@ -756,8 +853,9 @@
             'stats-active': { bn: 'সক্রিয়', en: 'Active' },
             'add-btn': { bn: 'ইফতার স্পট যোগ করুন', en: 'Add Iftar Spot' },
             'form-title': { bn: '➕ নতুন তথ্য দিন', en: '➕ Add New Info' },
-            'form-warning': { bn: 'মানচিত্রে ক্লিক করে সঠিক লোকেশন নির্বাচন করুন', en: 'Click on map to select exact location' },
-            'select-location-btn': { bn: 'মানচিত্রে লোকেশন নির্বাচন করুন', en: 'Select Location on Map' },
+            'form-warning': { bn: 'মানচিত্রে ক্লিক করে সঠিক লোকেশন নির্বাচন করুন (পিন দেখা যাবে)', en: 'Click on map to select exact location (pin appears)' },
+            'select-location-btn-text': { bn: 'মানচিত্রে লোকেশন নির্বাচন করুন', en: 'Select Location on Map' },
+            'select-btn-text': { bn: 'এই স্থান নির্বাচন করুন', en: 'Select this location' },
             'district-label': { bn: 'জেলা নির্বাচন করুন *', en: 'Select District *' },
             'submit-btn': { bn: 'জমা দিন', en: 'Submit' },
             'final-warning': { bn: 'মনে রাখবেন: আপনি যে তথ্য দিচ্ছেন তা সঠিক কিনা নিশ্চিত হোন। মিথ্যা তথ্য দেওয়া ইসলামী দৃষ্টিতে সমর্থনযোগ্য নয়।', en: 'Remember: Make sure the information you are providing is accurate. Providing false information is not permissible in Islamic terms.' },
@@ -787,17 +885,23 @@
     }
     
     // ==================== DISTRICT DATA ====================
-    const BANGLADESH_DISTRICTS = [
-        'কুমিল্লা', 'কক্সবাজার', 'কিশোরগঞ্জ', 'কুষ্টিয়া', 'খাগড়াছড়ি', 'খুলনা', 'গাইবান্ধা',
-        'গাজীপুর', 'গোপালগঞ্জ', 'চট্টগ্রাম', 'চাঁদপুর', 'চুয়াডাঙ্গা', 'জয়পুরহাট', 'ঝালকাঠি',
-        'ঝিনাইদহ', 'টাঙ্গাইল', 'ঠাকুরগাঁও', 'ঢাকা', 'নওগাঁ', 'নড়াইল', 'নরসিংদী',
-        'নাটোর', 'নেত্রকোণা', 'নোয়াখালী', 'পঞ্চগড়', 'পটুয়াখালী', 'পাবনা', 'পিরোজপুর',
-        'ফরিদপুর', 'ফেনী', 'বগুড়া', 'বরগুনা', 'বরিশাল', 'বান্দরবান', 'ব্রাহ্মণবাড়িয়া',
-        'ভোলা', 'ময়মনসিংহ', 'মাগুরা', 'মাদারীপুর', 'মানিকগঞ্জ', 'মুন্সীগঞ্জ', 'মেহেরপুর',
-        'যশোর', 'রংপুর', 'রাঙ্গামাটি', 'রাজবাড়ী', 'রাজশাহী', 'লক্ষ্মীপুর', 'লালমনিরহাট',
-        'শরীয়তপুর', 'শেরপুর', 'সাতক্ষীরা', 'সিরাজগঞ্জ', 'সিলেট', 'সুনামগঞ্জ',
-        'হবিগঞ্জ', 'মৌলভীবাজার', 'কুড়িগ্রাম', 'নীলফামারী', 'দিনাজপুর'
-    ];
+const BANGLADESH_DISTRICTS = [
+    'ঢাকা', 'ফরিদপুর', 'গাজীপুর', 'গোপালগঞ্জ', 'কিশোরগঞ্জ', 'মাদারীপুর', 'মানিকগঞ্জ', 'মুন্সীগঞ্জ', 'নারায়ণগঞ্জ', 'নরসিংদী', 'রাজবাড়ী', 'শরীয়তপুর', 'টাঙ্গাইল',
+
+    'বান্দরবান', 'ব্রাহ্মণবাড়িয়া', 'চাঁদপুর', 'চট্টগ্রাম', 'কক্সবাজার', 'কুমিল্লা', 'ফেনী', 'খাগড়াছড়ি', 'লক্ষ্মীপুর', 'নোয়াখালী', 'রাঙ্গামাটি',
+
+    'বরিশাল', 'বরগুনা', 'ভোলা', 'ঝালকাঠি', 'পটুয়াখালী', 'পিরোজপুর',
+
+    'খুলনা', 'বাগেরহাট', 'চুয়াডাঙ্গা', 'যশোর', 'ঝিনাইদহ', 'কুষ্টিয়া', 'মাগুরা', 'মেহেরপুর', 'নড়াইল', 'সাতক্ষীরা',
+
+    'রাজশাহী', 'বগুড়া', 'চাঁপাইনবাবগঞ্জ', 'জয়পুরহাট', 'নওগাঁ', 'নাটোর', 'পাবনা', 'সিরাজগঞ্জ',
+
+    'রংপুর', 'গাইবান্ধা', 'কুড়িগ্রাম', 'লালমনিরহাট', 'নীলফামারী', 'পঞ্চগড়', 'ঠাকুরগাঁও', 'দিনাজপুর',
+
+    'ময়মনসিংহ', 'জামালপুর', 'নেত্রকোণা', 'শেরপুর',
+
+    'সিলেট', 'হবিগঞ্জ', 'মৌলভীবাজার', 'সুনামগঞ্জ'
+];
     
     const UNIQUE_DISTRICTS = [...new Set(BANGLADESH_DISTRICTS)].sort((a, b) => a.localeCompare(b, 'bn'));
     
@@ -815,6 +919,7 @@
         const savedVotes = localStorage.getItem(`votes_${userIP}`);
         if (savedVotes) {
             userVotes = JSON.parse(savedVotes);
+            hasVoted = Object.keys(userVotes).length > 0;
         }
     }
     
@@ -828,18 +933,11 @@
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     }
     
-    // ==================== TRUTH/ FALSE VOTE SYSTEM ====================
+    // ==================== TRUTH/FALSE VOTE SYSTEM (strict one vote per IP) ====================
     async function votePost(postId, voteValue) {
         if (!userIP) await getUserIP();
         
-        // Check if already voted for this post
-        if (userVotes[postId]) {
-            alert(currentLang === 'bn' ? 'আপনি ইতিমধ্যে এই পোস্টে ভোট দিয়েছেন' : 'You have already voted for this post');
-            return;
-        }
-        
-        // Check if voted for any post (one vote per IP across all posts)
-        const hasVoted = Object.keys(userVotes).length > 0;
+        // Check if already voted for any post (one vote per IP total)
         if (hasVoted) {
             alert(currentLang === 'bn' ? 'আপনি ইতিমধ্যে একটি পোস্টে ভোট দিয়েছেন। আপনি শুধুমাত্র একটি পোস্টে ভোট দিতে পারবেন।' : 'You have already voted for one post. You can only vote for one post.');
             return;
@@ -869,6 +967,7 @@
             
             // Record user vote
             userVotes[postId] = voteValue;
+            hasVoted = true;
             localStorage.setItem(`votes_${userIP}`, JSON.stringify(userVotes));
             
             alert(currentLang === 'bn' ? 'ভোট দেওয়া হয়েছে! ধন্যবাদ।' : 'Vote submitted! Thank you.');
@@ -879,7 +978,7 @@
         }
     }
     
-    // ==================== MAP SELECTION ====================
+    // ==================== MAP SELECTION with permanent pin ====================
     function startMapSelection() {
         if (!mapInitialized) initMap();
         
@@ -895,6 +994,7 @@
     
     function onMapSelect(e) {
         const { lat, lng } = e.latlng;
+        tempLatLng = { lat, lng };
         
         // Check if within Bangladesh
         if (lat < BANGLADESH_BOUNDS.south || lat > BANGLADESH_BOUNDS.north || 
@@ -902,6 +1002,41 @@
             alert(currentLang === 'bn' ? 'দয়া করে বাংলাদেশের ভিতরে লোকেশন নির্বাচন করুন' : 'Please select a location within Bangladesh');
             return;
         }
+        
+        // Remove previous temp pin if exists
+        if (tempPin) {
+            map.removeLayer(tempPin);
+        }
+        
+        // Create custom icon with Font Awesome
+        const customIcon = L.divIcon({
+            className: 'custom-marker',
+            html: '<i class="fa-solid fa-location-dot" style="font-size: 48px; color: #b45309; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);"></i>',
+            iconSize: [48, 48],
+            iconAnchor: [24, 48],
+            popupAnchor: [0, -48]
+        });
+        
+        // Add permanent pin
+        tempPin = L.marker([lat, lng], {
+            icon: customIcon,
+            zIndexOffset: 1000
+        }).addTo(map);
+        
+        // Show select button
+        document.getElementById('select-location-btn').classList.add('show');
+        
+        // Fly to location
+        map.flyTo([lat, lng], 16);
+    }
+    
+    function confirmMapSelection() {
+        if (!tempLatLng) {
+            alert(currentLang === 'bn' ? 'প্রথমে মানচিত্রে একটি স্থান নির্বাচন করুন' : 'Please select a location on the map first');
+            return;
+        }
+        
+        const { lat, lng } = tempLatLng;
         
         // Store coordinates
         window.selectedLat = lat;
@@ -911,34 +1046,23 @@
         document.getElementById('selected-coords').classList.remove('hidden');
         document.getElementById('coords-display').innerHTML = `📍 নির্বাচিত: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
         
-        // Add temporary marker
-        if (window.tempMarker) {
-            map.removeLayer(window.tempMarker);
-        }
-        
-        window.tempMarker = L.marker([lat, lng], {
-            icon: L.divIcon({
-                className: 'custom-marker',
-                html: '📍',
-                iconSize: [36, 36]
-            })
-        }).addTo(map);
-        
-        // Fly to location
-        map.flyTo([lat, lng], 16);
-        
-        // Hide selection mode and show form
+        // Hide selection mode and select button
         cancelMapSelection();
+        document.getElementById('select-location-btn').classList.remove('show');
+        
+        // Show form
         document.getElementById('add-form').classList.remove('hidden');
         
         // Show success message
-        alert(currentLang === 'bn' ? 'লোকেশন নির্বাচন করা হয়েছে!' : 'Location selected!');
+        alert(currentLang === 'bn' ? 'লোকেশন নির্বাচন করা হয়েছে! পিনটি সংরক্ষিত থাকবে।' : 'Location selected! Pin remains.');
     }
     
     function cancelMapSelection() {
         document.getElementById('selection-mode').classList.add('hidden');
+        document.getElementById('select-location-btn').classList.remove('show');
         map.off('click', onMapSelect);
         map.getContainer().style.cursor = '';
+        tempLatLng = null;
     }
     
     // ==================== INITIALIZE ====================
@@ -998,6 +1122,47 @@
         }).addTo(map);
         
         markersLayer = L.layerGroup().addTo(map);
+        
+        // Add search control (centered)
+        const searchControl = L.Control.extend({
+            options: { position: 'topright' },
+            onAdd: function(map) {
+                const div = L.DomUtil.create('div', 'leaflet-control-search');
+                div.innerHTML = `
+                    <input class="search-input" placeholder="${currentLang === 'bn' ? 'এলাকা খুঁজুন...' : 'Search area...'}">
+                    <button class="search-button"><i class="fa-solid fa-search"></i></button>
+                `;
+                
+                // Prevent map click when interacting with search
+                L.DomEvent.disableClickPropagation(div);
+                L.DomEvent.disableScrollPropagation(div);
+                
+                div.querySelector('.search-button').onclick = () => {
+                    const query = div.querySelector('.search-input').value;
+                    if (query.length > 2) {
+                        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, Bangladesh`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                const lat = parseFloat(data[0].lat);
+                                const lng = parseFloat(data[0].lon);
+                                map.flyTo([lat, lng], 13);
+                            } else alert(currentLang === 'bn' ? 'পাওয়া যায়নি' : 'Not found');
+                        });
+                    }
+                };
+                
+                // Allow enter key to search
+                div.querySelector('.search-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        div.querySelector('.search-button').click();
+                    }
+                });
+                
+                return div;
+            }
+        });
+        map.addControl(new searchControl());
         
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
@@ -1126,7 +1291,6 @@
             const hasVoted = userVotes[post.id];
             const userVoteValue = userVotes[post.id];
             const truePercentage = post.truthScore || 0;
-            const falsePercentage = 100 - truePercentage;
             
             const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
             
@@ -1173,17 +1337,21 @@
                     </div>
                     
                     <div class="flex gap-2 mb-3" onclick="event.stopPropagation()">
-                        ${!hasVoted ? `
+                        ${!hasVoted && !hasVoted ? `
                             <button onclick="votePost('${post.id}', 'true')" class="vote-btn true flex-1">
                                 <i class="fa-solid fa-check-circle"></i> সঠিক
                             </button>
                             <button onclick="votePost('${post.id}', 'false')" class="vote-btn false flex-1">
                                 <i class="fa-solid fa-times-circle"></i> ভুল
                             </button>
-                        ` : `
+                        ` : hasVoted ? `
                             <div class="vote-btn voted flex-1 ${userVoteValue === 'true' ? 'true' : 'false'}">
                                 <i class="fa-solid ${userVoteValue === 'true' ? 'fa-check-circle' : 'fa-times-circle'}"></i>
                                 ${userVoteValue === 'true' ? 'সঠিক' : 'ভুল'} - ধন্যবাদ
+                            </div>
+                        ` : `
+                            <div class="vote-btn voted flex-1">
+                                <i class="fa-solid fa-check-circle"></i> ভোট দেওয়া হয়েছে
                             </div>
                         `}
                     </div>
@@ -1248,12 +1416,17 @@
         
         posts.forEach(post => {
             if (post.lat && post.lng) {
+                // Create custom icon for markers
+                const markerIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: '<i class="fa-solid fa-mosque" style="font-size: 36px; color: #b45309; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);"></i>',
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 36],
+                    popupAnchor: [0, -36]
+                });
+                
                 const marker = L.marker([post.lat, post.lng], {
-                    icon: L.divIcon({
-                        className: 'custom-marker',
-                        html: '🕌',
-                        iconSize: [36, 36]
-                    })
+                    icon: markerIcon
                 }).addTo(markersLayer);
                 
                 marker.bindPopup(`
@@ -1336,10 +1509,15 @@
             hideConfirmModal();
             toggleForm();
             
-            // Clear selected coordinates
+            // Clear selected coordinates and remove pin
             window.selectedLat = null;
             window.selectedLng = null;
             document.getElementById('selected-coords').classList.add('hidden');
+            if (tempPin) {
+                map.removeLayer(tempPin);
+                tempPin = null;
+            }
+            tempLatLng = null;
             
             alert(currentLang === 'bn' ? 'আলহামদুলিল্লাহ! তথ্য সফলভাবে জমা হয়েছে।' : 'Alhamdulillah! Information submitted successfully.');
         } catch (err) {
@@ -1357,12 +1535,6 @@
             document.getElementById('loc-desc').value = '';
             document.querySelectorAll('.district-btn').forEach(b => b.classList.remove('selected'));
             selectedDistrict = '';
-            
-            // Remove temp marker if exists
-            if (window.tempMarker) {
-                map.removeLayer(window.tempMarker);
-                window.tempMarker = null;
-            }
         }
     }
     
